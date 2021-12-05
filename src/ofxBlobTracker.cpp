@@ -18,11 +18,28 @@ ofxBlobTracker::ofxBlobTracker(){
     height = 0;
     
     movementFiltering = 0;
-    
     bUpdateBackground = true;
+    
+
+    
+    params.add(threshold.set("threshold", 100, 0, 255));
+    params.add(minArea.set("minArea", 10, 0, 50000));
+    params.add(maxArea.set("maxArea", 10000, 0, 500000));
+    params.add(nConsidered.set("nConsidered", 10, 0, 1000));
+    params.add(hullPress.set("hullPress", 0.1, 0.0, 1.0));
+    params.add(bFindHoles.set("bFindHoles", true));
+    params.add(distanceThreshold.set("distanceThreshold", 0.0, 0.0, 1.0));
+    params.add(nearsetNeighboursToCheck.set("nearsetNeighboursToCheck", 3, 1, 8));
+    params.add(brightness.set("brightness", 0.1, 0.0, 10.0));
+    params.add(contrast.set("contrast", 0.1, 0.0, 10.0));
+    params.add(blur.set("blur", 0, 0, 255));
+    params.add(bUseApproximation.set("bUseApproximation", true));
+    params.add(movementFiltering.set("movementFiltering", 1, 0, 15));
+    params.add(bUpdateBackground.set("bUpdateBackground", false));
+
 }
 
-void ofxBlobTracker::update( ofxCvGrayscaleImage& input, int _threshold, int _minArea,int _maxArea , int _nConsidered , double _hullPress , bool _bFindHoles , bool _bUseApproximation ){
+void ofxBlobTracker::update( ofxCvGrayscaleImage& input){
     
     if (( width != input.getWidth()) || 
         ( height != input.getHeight()) ){
@@ -37,14 +54,15 @@ void ofxBlobTracker::update( ofxCvGrayscaleImage& input, int _threshold, int _mi
         bUpdateBackground = false;
     }
     
+    input.brightnessContrast(brightness, contrast);
+    input.blur(blur);
     input.absDiff(backgroundImage);
-    
-    if (_threshold != -1)
-        input.threshold(_threshold);
+    if (threshold != -1)
+        input.threshold(threshold);
     
     input.updateTexture();
     
-    contourFinder.findContours(input, _minArea, _maxArea, _nConsidered, _hullPress, _bFindHoles, _bUseApproximation);
+    contourFinder.findContours(input, minArea, maxArea, nConsidered, hullPress, bFindHoles, bUseApproximation);
     track(&contourFinder);    
 }
 
@@ -73,7 +91,7 @@ void ofxBlobTracker::track(ofxContourFinder* newBlobs){
 		 * 'winner' should contain the index of the found blob or '-1' if
 		 * there was no corresponding blob
 		 *****************************************************************/
-		int winner = trackKnn(newBlobs, &(trackedBlobs[i]), 3, 0);
+		int winner = trackKnn(newBlobs, &(trackedBlobs[i]));
         
 		if(winner == -1) { //track has died, mark it for deletion
             ofNotifyEvent(blobDeleted, trackedBlobs[i]);
@@ -274,13 +292,13 @@ void ofxBlobTracker::track(ofxContourFinder* newBlobs){
  *			  must always be an odd number to avoid tying
  * thresh	= threshold for optimization
  **************************************************************************/
-int ofxBlobTracker::trackKnn(ofxContourFinder *newBlobs, ofxBlob *track, int k, double thresh){    
+int ofxBlobTracker::trackKnn(ofxContourFinder *newBlobs, ofxBlob *track){
 	int winner = -1; //initially label track as '-1'=dead
-	if((k%2)==0) k++; //if k is not an odd number, add 1 to it
+	if((nearsetNeighboursToCheck%2)==0) nearsetNeighboursToCheck++; //if k is not an odd number, add 1 to it
     
 	//if it exists, square the threshold to use as square distance
-	if(thresh>0)
-		thresh *= thresh;
+	//if(distanceThreshold>0)
+		//distanceThreshold *= distanceThreshold;
     
 	//list of neighbor point index and respective distances
 	std::list<std::pair<int,double> > nbors;
@@ -298,7 +316,7 @@ int ofxBlobTracker::trackKnn(ofxContourFinder *newBlobs, ofxBlob *track, int k, 
         yT = track->centroid.y;
         dist = (x-xT)*(x-xT)+(y-yT)*(y-yT);
         
-        if(dist<=thresh) { //it's good, apply label if no label yet and return
+        if(dist<=distanceThreshold) { //it's good, apply label if no label yet and return
             winner = i;
             return winner;
         }
@@ -312,10 +330,10 @@ int ofxBlobTracker::trackKnn(ofxContourFinder *newBlobs, ofxBlob *track, int k, 
         for(iter=nbors.begin(); iter!=nbors.end()
             && dist>=iter->second; iter++);
         
-        if((iter!=nbors.end())||(nbors.size()<k)) { //it's valid, insert it
+        if((iter!=nbors.end())||(nbors.size()<nearsetNeighboursToCheck)) { //it's valid, insert it
             nbors.insert(iter, 1, std::pair<int, double>(i, dist));
             //too many items in list, get rid of farthest neighbor
-            if(nbors.size()>k)
+            if(nbors.size()>nearsetNeighboursToCheck)
                 nbors.pop_back();
         }
     }
@@ -357,7 +375,7 @@ void ofxBlobTracker::draw( float _x, float _y, float _width, float _height ) {
     if( _height != 0 ) { scaley = _height/height; } 
 	
     ofPushStyle();
-    ofPushMatrix();
+    ofPushView();
     ofTranslate( _x, _y);
     ofScale( scalex, scaley);
 	
@@ -388,6 +406,6 @@ void ofxBlobTracker::draw( float _x, float _y, float _width, float _height ) {
         }
     }
     
-	ofPopMatrix();
+	ofPopView();
 	ofPopStyle();
 }

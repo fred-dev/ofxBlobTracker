@@ -1,2 +1,3 @@
-ofxOpenCv
 ofxBlobTracker
+ofxGui
+ofxOpenCv

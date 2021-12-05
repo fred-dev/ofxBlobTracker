@@ -60,7 +60,7 @@ public:
             float minDistance = 10000;
             
             for(unsigned int i = 0; i < pts.size(); i++){
-                float dist = centroid.distance( pts[i] );
+                float dist = ofVec2f(centroid).distance( ofVec2f(pts[i]) );
                 
                 if (dist > maxDistance)
                     maxDistance = dist;
@@ -96,7 +96,7 @@ public:
         ofPushMatrix();
         
         ofTranslate(x + angleBoundingRect.x * outputWidth, y + angleBoundingRect.y * outputHeight);
-        ofRotate(angle+90, 0.0f, 0.0f, 1.0f);
+        ofRotateDeg(angle+90, 0.0f, 0.0f, 1.0f);
         ofTranslate(-(x + angleBoundingRect.x * outputWidth), -(y + angleBoundingRect.y * outputHeight)); 
     
         ofPushStyle();
@@ -111,7 +111,7 @@ public:
     void drawBox(float x = 0, float y = 0, float outputWidth = ofGetWidth(), float outputHeight = ofGetHeight()){		
         ofPushMatrix();
         ofTranslate(x + angleBoundingRect.x * outputWidth, y + angleBoundingRect.y * outputHeight);
-        ofRotate(angle+90, 0.0f, 0.0f, 1.0f);
+        ofRotateDeg(angle+90, 0.0f, 0.0f, 1.0f);
         ofTranslate(-(x + angleBoundingRect.x * outputWidth), -(y + angleBoundingRect.y * outputHeight));                
         ofNoFill();
 		 

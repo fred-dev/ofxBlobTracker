@@ -17,10 +17,23 @@
 class ofxBlobTracker{
 public:
 	ofxBlobTracker();
+    ofParameterGroup params;
+    ofParameter<int> threshold;
+    ofParameter<int> minArea;
+    ofParameter<int> maxArea;
+    ofParameter<int> nConsidered;
+    ofParameter<double> hullPress;
+    ofParameter<double> distanceThreshold;
+    ofParameter<int> nearsetNeighboursToCheck;
+    ofParameter<float> brightness;
+    ofParameter<float> contrast;
+    ofParameter<int> blur;
+    ofParameter<bool> bFindHoles;
+    ofParameter<bool> bUseApproximation;
+    ofParameter<int>     movementFiltering;
+    ofParameter<bool>    bUpdateBackground;
     
-    void    update( ofxCvGrayscaleImage& input, int _threshold = -1, 
-                   int minArea = 20 ,int maxArea = (340*240)/3, int nConsidered = 10,
-                   double hullPress = 20, bool bFindHoles = false, bool bUseApproximation = true);
+    void    update( ofxCvGrayscaleImage& input);
     void    draw( float _x = 0, float _y = 0, float _width = 0, float _height = 0);
     
     int     size(){return trackedBlobs.size(); };
@@ -31,12 +44,11 @@ public:
     ofEvent<ofxBlob>    blobMoved;
     ofEvent<ofxBlob>    blobDeleted;
     
-    int     movementFiltering;
-    bool    bUpdateBackground;
+
 
 private:
 	void    track(ofxContourFinder* newBlobs);
-	int     trackKnn(ofxContourFinder *newBlobs, ofxBlob *track, int k, double thresh);
+	int     trackKnn(ofxContourFinder *newBlobs, ofxBlob *track);
     
     ofxContourFinder    contourFinder;
     ofxCvGrayscaleImage backgroundImage;

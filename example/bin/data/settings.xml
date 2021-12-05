@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<Blob_manager>
+	<group>
+		<threshold>161</threshold>
+		<minArea>1529</minArea>
+		<maxArea>418636</maxArea>
+		<nConsidered>10</nConsidered>
+		<hullPress>0.957988</hullPress>
+		<bFindHoles>0</bFindHoles>
+		<bUseApproximation>1</bUseApproximation>
+		<movementFiltering>0</movementFiltering>
+		<bUpdateBackground>0</bUpdateBackground>
+		<distanceThreshold>0</distanceThreshold>
+		<nearsetNeighboursToCheck>5</nearsetNeighboursToCheck>
+		<brightness>0.884307</brightness>
+		<contrast>0.622987</contrast>
+		<blur>71</blur>
+	</group>
+</Blob_manager>

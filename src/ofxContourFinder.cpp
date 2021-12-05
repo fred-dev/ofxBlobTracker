@@ -75,8 +75,7 @@ int ofxContourFinder::findContours(	ofxCvGrayscaleImage&  input,
 	contour_storage = cvCreateMemStorage( 1000 );
 	storage	= cvCreateMemStorage( 1000 );
 
-	CvContourRetrievalMode  retrieve_mode
-        = (bFindHoles) ? CV_RETR_LIST : CV_RETR_EXTERNAL;
+    int retrieve_mode = CV_RETR_LIST;
 	cvFindContours( inputCopy.getCvImage(), contour_storage, &contour_list,
                     sizeof(CvContour), retrieve_mode, bUseApproximation ? CV_CHAIN_APPROX_SIMPLE : CV_CHAIN_APPROX_NONE );
 	
@@ -155,7 +154,8 @@ int ofxContourFinder::findContours(	ofxCvGrayscaleImage&  input,
                 cvCvtSeqToArray(contourAprox, PointArray, CV_WHOLE_SEQ); // Get contour point set.
                 
                 // Find convex hull for curent contour.
-                cvConvexHull( PointArray, count, NULL, CV_COUNTER_CLOCKWISE, hull, &hullsize);
+                //cv::convexHull(<#InputArray points#>, <#OutputArray hull#>)
+               // cvConvexHull( PointArray, count, NULL, CV_COUNTER_CLOCKWISE, hull, &hullsize);
                 
                 int upper = 1, lower = 0;
                 for	(int j=0; j<hullsize; j++) {
